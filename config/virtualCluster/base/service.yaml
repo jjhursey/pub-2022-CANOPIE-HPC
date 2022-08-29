@@ -1,0 +1,12 @@
+# Create a Headless Service to provide DNS to the StatefulSet
+# So we can do things like: ping hpc-cn-1.hpc-cluster
+# without having to resolve the POD IP address manually
+apiVersion: v1
+kind: Service
+metadata:
+  name: hpc-cluster
+  namespace: kube-pmix
+spec:
+  selector:
+    app: hpc-compute-nodes
+  clusterIP: None

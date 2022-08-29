@@ -1,0 +1,36 @@
+source:
+  kind: Service
+  name: hpc-cluster
+  fieldPath: metadata.namespace
+targets:
+- select:
+    kind: StatefulSet
+    name: hpc-cn
+  fieldPaths:
+   - spec.template.spec.dnsConfig.searches.0
+  options:
+    delimiter: '.'
+    index: 1
+- select:
+    kind: Job
+    name: hpc-cluster-login
+  fieldPaths:
+   - spec.template.spec.dnsConfig.searches.0
+  options:
+    delimiter: '.'
+    index: 1
+- select:
+    kind: Job
+    name: hpc-cluster-login
+  fieldPaths:
+   - spec.template.spec.initContainers.[name=job-waiter].args.3
+- select:
+    kind: ClusterRoleBinding
+    name: read-pods 
+  fieldPaths:
+   - metadata.namespace
+- select:
+    kind: ClusterRoleBinding
+    name: read-pods 
+  fieldPaths:
+   - subjects.[kind=ServiceAccount].namespace

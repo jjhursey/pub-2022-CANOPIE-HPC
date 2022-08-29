@@ -1,0 +1,77 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: kube-pmix
+
+commonLabels:
+  hpcjob: test-ssh
+
+replicas:
+- count: 5
+  name: hpc-cn
+
+images:
+- name: k8s-compute
+  newName: quay.io/my-user/k8s-runtime-with-podman
+  newTag: latest
+- name: k8s-login
+  newName: quay.io/my-user/k8s-runtime-with-podman
+  newTag: latest
+- name: k8s-waitfor
+  newName: quay.io/my-user/k8s-waitfor
+  newTag: latest
+
+resources:
+- ../base
+- ../rbac
+
+patches:
+- patch: |-
+    kind: StatefulSet
+    metadata:
+      name: hpc-cn
+    spec:
+      template:
+        spec:
+          securityContext:
+            runAsUser: 0
+            runAsGroup: 0
+            fsGroup: 0
+          containers:
+            - name: k8s-compute
+              ports:
+                - containerPort: 2222
+              securityContext:
+                runAsUser: 0
+              command:
+                - "/usr/sbin/sshd"
+              args:
+                - "-D"
+  target:
+    kind: StatefulSet
+    name: hpc-cn
+- patch: |-
+    kind: Job
+    metadata:
+      name: hpc-cluster-login
+    spec:
+      template:
+        spec:
+          containers:
+            - name: login
+              env:
+              - name: OMPI_MCA_orte_default_hostfile
+                value: /opt/hpc/etc/hostfile_ip
+              - name: PRTE_MCA_prte_default_hostfile
+                value: /opt/hpc/etc/hostfile_ip
+  target:
+    kind: Job
+    name: hpc-cluster-login
+
+# Some replacements for consistency across the profiles
+replacements:
+- path: ../replacements/replace-namespace.yaml
+- path: ../replacements/replace-service.yaml
+- path: ../replacements/replace-cn.yaml
+- path: ../replacements/replace-label.yaml
+- path: ../replacements/replace-size.yaml

@@ -1,0 +1,7 @@
+PidFile /home/mpiuser/sshd.pid
+HostKey /home/mpiuser/.ssh/id_rsa
+StrictModes no
+Port 2222
+AuthorizedKeysFile  .ssh/authorized_keys
+ChallengeResponseAuthentication no
+UsePAM no

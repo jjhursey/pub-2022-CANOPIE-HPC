@@ -1,0 +1,15 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: kube-pmix
+
+resources:
+- job.yaml
+- statefulset.yaml
+- service.yaml
+- namespace.yaml
+
+images:
+- name: k8s-waitfor
+  newName: quay.io/my-user/k8s-waitfor
+  newTag: latest

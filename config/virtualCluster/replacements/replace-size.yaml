@@ -1,0 +1,10 @@
+source:
+  kind: StatefulSet
+  name: hpc-cn
+  fieldPath: spec.replicas
+targets:
+- select:
+    kind: Job
+    name: hpc-cluster-login
+  fieldPaths:
+   - spec.template.spec.initContainers.[name=job-waiter].args.2

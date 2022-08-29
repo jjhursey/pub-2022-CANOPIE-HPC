@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  # Prefix for the hostname: (statefulset name)-(ordinal)
+  name: hpc-cn
+spec:
+  # Start all pods concurrently (default is sequentially)
+  podManagementPolicy: Parallel
+  # Number of containers in our cluster
+  replicas: 3
+  selector:
+    matchLabels:
+      # 'app' Must match that referenced by the Service
+      app: hpc-compute-nodes
+      hpcnode: compute-node
+  # Connect to the Headless Service (below)
+  serviceName: hpc-cluster
+  template:
+    metadata:
+      labels:
+        # 'app' must match the selector above
+        app: hpc-compute-nodes
+        hpcnode: compute-node
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: node-role.kubernetes.io/master
+                operator: DoesNotExist
+      # Run as the specified user
+      serviceAccount: pmix-user
+      securityContext:
+        runAsUser: 998
+        runAsGroup: 995
+        fsGroup: 995
+      dnsConfig:
+        searches:
+          -  SERVICE_NAME.NAMESPACE
+      containers:
+      - name: k8s-compute
+        # Hardware/Resource scheduling requirements for the POD
+        resources:
+          requests:
+            # 20 hardware threads
+            cpu: 1
+        securityContext:
+          runAsUser: 998
+        # Always force a re-pull of the image when starting
+        imagePullPolicy: Always
+        #imagePullPolicy: IfNotPresent
+        # Only pull the image if it is not present
+        #imagePullPolicy: IfNotPresent
+        image: k8s-compute:latest
+        # Default command to run - keeps container idling and cleans up defunct procs
+        command: ["/opt/k8s/bin/pause"]
+        # Environment variables
+        env:
+        - name: SHELL
+          value: /bin/bash

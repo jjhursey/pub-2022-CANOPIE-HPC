@@ -1,0 +1,14 @@
+source:
+  kind: StatefulSet
+  name: hpc-cn
+  fieldPath: metadata.labels.hpcjob
+targets:
+- select:
+    kind: Job
+    name: hpc-cluster-login
+  fieldPaths:
+   - spec.template.spec.initContainers.[name=job-waiter].args.4
+  options:
+    delimiter: '='
+    index: 2
+

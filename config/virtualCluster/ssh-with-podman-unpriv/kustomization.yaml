@@ -1,0 +1,62 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: kube-pmix
+
+commonLabels:
+  hpcjob: test-ssh-with-podman
+
+resources:
+- ../ssh
+
+patches:
+- patch: |-
+    kind: StatefulSet
+    metadata:
+      name: hpc-cn
+    spec:
+      template:
+        spec:
+          containers:
+            - name: k8s-compute
+              resources:
+                limits:
+                  github.com/fuse: 1
+  target:
+    kind: StatefulSet
+    name: hpc-cn
+- patch: |-
+    kind: Job
+    metadata:
+      name: hpc-cluster-login
+    spec:
+      template:
+        spec:
+          containers:
+            - name: login
+              resources:
+                limits:
+                  github.com/fuse: 1
+              env:
+              - name: PMIX_MCA_psec
+                value: none
+              - name: PRTE_MCA_schizo_proxy
+                value: ompi
+  target:
+    kind: Job
+    name: hpc-cluster-login
+
+images:
+- name: k8s-compute
+  newName: quay.io/my-user/k8s-runtime-with-podman
+  newTag: latest
+- name: k8s-login
+  newName: quay.io/my-user/k8s-runtime-with-podman
+  newTag: latest
+- name: k8s-waitfor
+  newName: quay.io/my-user/k8s-waitfor
+  newTag: latest
+
+
+replacements:
+- path: ../replacements/replace-label.yaml

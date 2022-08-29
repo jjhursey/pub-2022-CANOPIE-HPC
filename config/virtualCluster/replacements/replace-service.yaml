@@ -1,0 +1,26 @@
+source:
+  kind: Service
+  name: hpc-cluster
+  fieldPath: metadata.name
+targets:
+- select:
+    kind: StatefulSet
+    name: hpc-cn
+  fieldPaths:
+   - spec.template.spec.dnsConfig.searches.0
+  options:
+    delimiter: '.'
+    index: 0
+- select:
+    kind: Job
+    name: hpc-cluster-login
+  fieldPaths:
+   - spec.template.spec.dnsConfig.searches.0
+  options:
+    delimiter: '.'
+    index: 0
+- select:
+    kind: Job
+    name: hpc-cluster-login
+  fieldPaths:
+   - spec.template.spec.initContainers.[name=job-waiter].args.5
