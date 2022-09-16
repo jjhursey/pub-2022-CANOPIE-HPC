@@ -2,7 +2,6 @@
 
 The software in this repository pairs with the CANOPIE-HPC 2022 workshop paper:
  * "A separated model for running rootless, unprivileged PMIx-enabled HPC applications in Kubernetes"
- * **Note:** This paper is under review.
 
 ## Demonstration from the paper
 
@@ -114,7 +113,7 @@ make undeploy-ssh-with-podman-unpriv
    * [How to use Podman inside of Kubernetes](https://www.redhat.com/sysadmin/podman-inside-kubernetes)
  * To run "Rootless Podman without the privileged flag" you will need to have a means of mounting the `/dev/fuse` filesystem mount into the container.
    * We do this using a Kubernetes [`DevicePlugin`](https://kubernetes.io/docs/concepts/extend-kubernetes/compute-storage-net/device-plugins/)
-   * I forked an updated an existing project that does just that in [https://github.com/jjhursey/fuse-device-plugin/tree/ppc64le-support](fuse-device-plugin GitHub Project)
+   * I forked an updated an existing project that does just that in [fuse-device-plugin GitHub Project](https://github.com/jjhursey/fuse-device-plugin/tree/ppc64le-support)
 
 ```
 git clone -b ppc64le-support git@github.com:jjhursey/fuse-device-plugin.git
